@@ -1,69 +1,91 @@
-# Strapi Upload Provider for Digital Ocean Spaces
-- This provider is a fork of [AdamZikmund's](https://github.com/AdamZikmund) [strapi upload provider](https://github.com/AdamZikmund/strapi-provider-upload-digitalocean) for Digital Ocean spaces.
+# Strapi Upload Provider for Supabase storage
 
-This provider will upload to the space using the AWS S3 API.
+- This provider is a fork of [shorwood's](https://github.com/shorwood) [strapi upload provider digitalocean](https://github.com/shorwood/strapi-provider-upload-do) for Digital Ocean spaces, but applied to [Supabase storage](https://supabase.io/)
 
 ## Parameters
-- **key** : [Space access key](https://cloud.digitalocean.com/account/api/tokens)
-- **secret** : [Space access secret](https://cloud.digitalocean.com/account/api/tokens)
-- **endpoint** : Base URL of the space (e.g. `fra.digitaloceanspaces.com`)
-- **space** : Name of the space in the Digital Ocean panel.
-- **directory** : Name of the sub-directory you want to store your files in. (Optionnal - e.g. `/example`)
-- **cdn** : CDN Endpoint - URL of the cdn of the space (Optionnal - e.g. `cdn.example.com`)
+
+- **apiUrl** : [Supabase API Url](https://supabase.io/docs/reference/javascript/initializing)
+- **apiKey** : [Supabase API Key](https://supabase.io/docs/reference/javascript/initializing)
+- **bucket** : [Supabase storage bucket](https://supabase.io/docs/guides/storage)
+- **directory** : [Directory inside Supabase storage bucket](https://supabase.io/docs/guides/storage)
+- **options** : [Supabase client additional options](https://supabase.io/docs/reference/javascript/initializing#with-additional-parameters)
 
 ## How to use
 
 1. Install this package
 
-```bash
-npm i strapi-provider-upload-do
 ```
-```bash
-yarn add strapi-provider-upload-do
-```
-```bash
-pnpm add strapi-provider-upload-do
+npm i strapi-provider-upload-supabase-v4
 ```
 
-2. Create or update config in `./config/plugins.js` with content
+2. Create config in `./config/plugins.js` with content
 
-```js
-module.exports = ({env}) => ({
+```
+module.exports = ({ env }) => ({
   // ...
   upload: {
     config: {
-      provider: "strapi-provider-upload-do", 
+      provider: "strapi-provider-upload-supabase-v4",
       providerOptions: {
-        key: env('DO_SPACE_ACCESS_KEY'),
-        secret: env('DO_SPACE_SECRET_KEY'),
-        endpoint: env('DO_SPACE_ENDPOINT'),
-        space: env('DO_SPACE_BUCKET'),
-        directory: env('DO_SPACE_DIRECTORY'),
-        cdn: env('DO_SPACE_CDN'),
-      }
+        apiUrl: env("SUPABASE_API_URL"),
+        apiKey: env("SUPABASE_API_KEY"),
+        bucket: env("SUPABASE_BUCKET"),
+        directory: env("SUPABASE_DIRECTORY"),
+        options: {},
+      },
+      actionOptions: {
+        upload: {},
+        uploadStream: {},
+        delete: {},
+      },
     },
-  }, 
+  },
   // ...
-})
+});
+```
+
+3. Create `.env` and add to them
+
+```
+SUPABASE_API_URL="<Your Supabase url>"
+SUPABASE_API_KEY="<Your Supabase api key>"
+SUPABASE_BUCKET="strapi-uploads"
+SUPABASE_DIRECTORY=""
+```
+
+4. Create middleware in `./config/middlewares.js` with content
+
+```
+module.exports = ({ env }) => [
+  "strapi::errors",
+  {
+    name: "strapi::security",
+    config: {
+      contentSecurityPolicy: {
+        directives: {
+          "default-src": ["'self'"],
+          "img-src": ["'self'", "data:", "blob:", env("SUPABASE_API_URL")],
+        },
+      },
+    },
+  },
+  "strapi::cors",
+  "strapi::poweredBy",
+  "strapi::logger",
+  "strapi::query",
+  "strapi::body",
+  "strapi::session",
+  "strapi::favicon",
+  "strapi::public",
+];
 
 ```
 
-3. Create `.env` and add provide Digital Ocean config.
+with values obtained from this page:
 
-```bash
-DO_SPACE_ACCESS_KEY=
-DO_SPACE_SECRET_KEY=
-DO_SPACE_ENDPOINT=
-DO_SPACE_BUCKET=
-DO_SPACE_DIRECTORY=
-DO_SPACE_CDN=
-```
+> https://app.supabase.io/project/<your-project>/settings/api
 
-with values obtained from tutorial:
-
-> https://www.digitalocean.com/community/tutorials/how-to-create-a-digitalocean-space-and-api-key
-
-Parameter `DO_SPACE_DIRECTORY` and `DO_SPACE_CDN` is optional and you can ommit them both in `.env` and `settings`.
+Parameters `options`, `bucket` and `directory` are optional and you can omit it, they will take the values shown in the example above.
 
 ## Resources
 
@@ -75,12 +97,4 @@ Parameter `DO_SPACE_DIRECTORY` and `DO_SPACE_CDN` is optional and you can ommit 
 - [Strapi community on Slack](http://slack.strapi.io)
 - [Strapi news on Twitter](https://twitter.com/strapijs)
 - [Strapi docs about upload](https://strapi.io/documentation/3.0.0-beta.x/plugins/upload.html#configuration)
-
-## Contributors
-<a href="https://github.com/AdamZikmund"><img src="https://avatars.githubusercontent.com/u/4062779?v=3" title="AdamZikmund" width="80" height="80"></a>
-<a href="https://github.com/gustawdaniel"><img src="https://avatars.githubusercontent.com/u/16663028?v=3" title="gustawdaniel" width="80" height="80"></a>
-<a href="https://github.com/latenssi"><img src="https://avatars.githubusercontent.com/u/1526792?v=4" title="latenssi" width="80" height="80"></a>
-<a href="https://github.com/malithmcr"><img src="https://avatars.githubusercontent.com/u/4549859?v=4" title="malithmcr" width="80" height="80"></a>
-<a href="https://github.com/tommasongr"><img src="https://avatars.githubusercontent.com/u/25225746?v=4" title="tommasongr" width="80" height="80"></a>
-<a href="https://github.com/maxep"><img src="https://avatars.githubusercontent.com/u/6815992?v=4" title="maxep" width="80" height="80"></a>
-<a href="https://github.com/anwarpro"><img src="https://avatars.githubusercontent.com/u/47409922?v=4" title="maxep" width="80" height="80"></a>
+- [Strapi Provider DO which inspired this plugin](https://github.com/shorwood/strapi-provider-upload-do)
