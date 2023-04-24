@@ -15,7 +15,7 @@
 1. Install this package
 
 ```
-npm i strapi-provider-upload-supabase-v4
+npm i strapi-provider-upload-supabase-4
 ```
 
 2. Create config in `./config/plugins.js` with content
@@ -25,7 +25,7 @@ module.exports = ({ env }) => ({
   // ...
   upload: {
     config: {
-      provider: "strapi-provider-upload-supabase-v4",
+      provider: "strapi-provider-upload-supabase-4",
       providerOptions: {
         apiUrl: env("SUPABASE_API_URL"),
         apiKey: env("SUPABASE_API_KEY"),
