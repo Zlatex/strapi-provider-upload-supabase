@@ -1,6 +1,6 @@
 {
   "name": "strapi-provider-upload-supabase-4",
-  "version": "1.1.41",
+  "version": "1.1.43",
   "description": "Supabase storage provider for Strapi upload plugin",
   "homepage": "http://strapi.io",
   "keywords": [
@@ -15,8 +15,8 @@
   },
   "main": "./lib",
   "scripts": {
-    "publish": "npm version patch --no-git-tag-version && npm publish",
-    "publish-beta": "npm version pre --preid beta --no-git-tag-version && npm publish --tag beta"
+    "publish:release": "npm version patch --no-git-tag-version && npm publish",
+    "publish:beta": "npm version pre --preid beta --no-git-tag-version && npm publish --tag beta"
   },
   "dependencies": {
     "@supabase/supabase-js": "^1.35.6"
@@ -33,7 +33,7 @@
     "url": "https://github.com/Zlatex/strapi-provider-upload-supabase/issues"
   },
   "engines": {
-    "node": ">=14.19.1 <=16.x.x",
+    "node": ">=16.x.x",
     "npm": ">= 6.0.0"
   },
   "license": "MIT",
